@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TactiCore | Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .auth-box { max-width:420px; margin:50px auto; padding:24px;
+      border-radius:16px; background:#142820; color:white; }
+    .auth-box input, .auth-box button { box-sizing:border-box;
+      width:100%; padding:13px; margin:8px 0; border-radius:8px; }
+    .auth-box input { border:1px solid #567; background:#fff; color:#111; }
+    .auth-box button { cursor:pointer; font-weight:bold; }
+    #status { overflow-wrap:anywhere; }
+  </style>
+</head>
+<body>
+  <main class="auth-box">
+    <h1>TactiCore Login</h1>
+    <p>Understand the Game. Master the Tactics.</p>
+
+    <form id="authForm">
+      <label for="email">Email</label>
+      <input id="email" type="email" required autocomplete="email">
+
+      <label for="password">Password</label>
+      <input id="password" type="password" required
+        minlength="6" autocomplete="current-password">
+
+      <button type="submit">Login</button>
+      <button type="button" id="signup">Create Account</button>
+    </form>
+
+    <p id="status" role="status"></p>
+    <a href="index.html">Back to Home</a>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const client = window.supabase.createClient(
+      "https://vykhzurogtlfanhlhsqh.supabase.co",
+      "sb_publishable_oRl89Tsiv1GmWHk-381RZQ_3UE4hcwy"
+    );
+
+    const form = document.getElementById("authForm");
+    const status = document.getElementById("status");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      status.textContent = "Logging in...";
+
+      const { error } = await client.auth.signInWithPassword({
+        email: email.value.trim(),
+        password: password.value
+      });
+
+      if (error) {
+        status.textContent = error.message;
+        return;
+      }
+
+      window.location.href = "index.html";
+    });
+
+    document.getElementById("signup").addEventListener("click",
+      async () => {
+        status.textContent = "Creating account...";
+
+        const { data, error } = await client.auth.signUp({
+          email: email.value.trim(),
+          password: password.value,
+          options: {
+            emailRedirectTo:
+              "https://gaurangrathore37-cell.github.io/TactiCore/"
+          }
+        });
+
+        if (error) {
+          status.textContent = error.message;
+          return;
+        }
+
+        status.textContent = data.session
+          ? "Account created! You are signed in."
+          : "Account created. Check your email if verification is required.";
+      }
+    );
+  </script>
+</body>
+</html>
